@@ -4,7 +4,10 @@ import { Link, useNavigate } from "react-router-dom";
 function Navbar() {
   const navigate = useNavigate();
 
-  // ✅ Safely parse user data
+  // ✅ Get backend URL from Vite env
+  const backendURL = import.meta.env.VITE_BACKEND_URL;
+
+  // ✅ Safe user parsing
   let userData = null;
   try {
     const userString = localStorage.getItem("user");
@@ -43,25 +46,27 @@ function Navbar() {
 
   const [showUserInfo, setShowUserInfo] = useState(false);
 
+  const initialResources = {
+    notesUrl: [],
+    playlistUrls: [],
+    tutorialLinks: [],
+    pyqLinks: [],
+    pyqBookUrl: "",
+    subjectName: "",
+    yearWisePYQs: [],
+  };
+
   useEffect(() => {
     if (year && semester && branch) {
       setSubjectsLoading(true);
       setSubjectsError(null);
 
-      fetch(`http://localhost:5000/api/subjects?year=${year}&semester=${semester}&branch=${branch}`)
+      fetch(`${backendURL}/api/subjects?year=${year}&semester=${semester}&branch=${branch}`)
         .then((res) => res.json())
         .then((data) => {
           setSubjects(Array.isArray(data.subjects) ? data.subjects : []);
           setSubject("");
-          setResources({
-            notesUrl: [],
-            playlistUrls: [],
-            tutorialLinks: [],
-            pyqLinks: [],
-            pyqBookUrl: "",
-            subjectName: "",
-            yearWisePYQs: [],
-          });
+          setResources({ ...initialResources });
           setSubjectsLoading(false);
         })
         .catch(() => {
@@ -69,28 +74,12 @@ function Navbar() {
           setSubjectsError("Failed to load subjects");
           setSubjectsLoading(false);
           setSubject("");
-          setResources({
-            notesUrl: [],
-            playlistUrls: [],
-            tutorialLinks: [],
-            pyqLinks: [],
-            pyqBookUrl: "",
-            subjectName: "",
-            yearWisePYQs: [],
-          });
+          setResources({ ...initialResources });
         });
     } else {
       setSubjects([]);
       setSubject("");
-      setResources({
-        notesUrl: [],
-        playlistUrls: [],
-        tutorialLinks: [],
-        pyqLinks: [],
-        pyqBookUrl: "",
-        subjectName: "",
-        yearWisePYQs: [],
-      });
+      setResources({ ...initialResources });
     }
   }, [year, semester, branch]);
 
@@ -99,8 +88,7 @@ function Navbar() {
       setResourcesLoading(true);
       setResourcesError(null);
 
-      fetch(`http://localhost:5000/api/resources?subject=${encodeURIComponent(subject)}&branch=${branch}`)
-
+      fetch(`${backendURL}/api/resources?subject=${encodeURIComponent(subject)}&branch=${branch}`)
         .then((res) => res.json())
         .then((data) => {
           setResources({
@@ -119,15 +107,7 @@ function Navbar() {
           setResourcesLoading(false);
         });
     } else {
-      setResources({
-        notesUrl: [],
-        playlistUrls: [],
-        tutorialLinks: [],
-        pyqLinks: [],
-        pyqBookUrl: "",
-        subjectName: "",
-        yearWisePYQs: [],
-      });
+      setResources({ ...initialResources });
     }
   }, [subject]);
 
@@ -137,7 +117,6 @@ function Navbar() {
     navigate("/login");
   };
 
-  // ✅ Safely parse user for display
   let user = {};
   try {
     const userString = localStorage.getItem("user");

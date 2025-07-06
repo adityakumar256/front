@@ -5,6 +5,9 @@ function Login() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const navigate = useNavigate();
 
+  // ✅ Use the VITE_BACKEND_URL from your .env
+  const backendURL = import.meta.env.VITE_BACKEND_URL;
+
   const handleChange = (e) => {
     setFormData(prev => ({
       ...prev,
@@ -15,20 +18,20 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('http://localhost:5000/api/login', {
+      const res = await fetch(`${backendURL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // ✅ if you use cookies/JWT
         body: JSON.stringify(formData)
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        
         localStorage.setItem('user', JSON.stringify({ ...data.user, token: data.token }));
 
         alert('Login successful!');
-        navigate('/'); 
+        navigate('/');
       } else {
         alert(data.message || 'Login failed');
       }

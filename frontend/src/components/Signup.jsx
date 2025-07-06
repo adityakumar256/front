@@ -4,6 +4,9 @@ import { useNavigate } from "react-router-dom";
 function Signup() {
   const navigate = useNavigate();
 
+  // ✅ Use Vite env for backend URL
+  const backendURL = import.meta.env.VITE_BACKEND_URL;
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -21,7 +24,7 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5000/api/signup", {
+      const res = await fetch(`${backendURL}/api/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -31,10 +34,13 @@ function Signup() {
 
       if (res.ok) {
         alert("Signup successful!");
-        // Save full user info + token in localStorage
-        localStorage.setItem("user", JSON.stringify({ ...data.user, token: data.token }));
 
-        navigate("/"); // Redirect to dashboard or home page
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ ...data.user, token: data.token })
+        );
+
+        navigate("/"); // Redirect to home or dashboard
       } else {
         alert(data.message || "Signup failed");
       }
