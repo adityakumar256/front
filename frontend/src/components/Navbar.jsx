@@ -4,10 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 function Navbar() {
   const navigate = useNavigate();
 
-  // ✅ Get backend URL from Vite env
-  const backendURL = import.meta.env.VITE_BACKEND_URL;
-
-  // ✅ Safe user parsing
+  // ✅ Safely parse user data
   let userData = null;
   try {
     const userString = localStorage.getItem("user");
@@ -46,27 +43,25 @@ function Navbar() {
 
   const [showUserInfo, setShowUserInfo] = useState(false);
 
-  const initialResources = {
-    notesUrl: [],
-    playlistUrls: [],
-    tutorialLinks: [],
-    pyqLinks: [],
-    pyqBookUrl: "",
-    subjectName: "",
-    yearWisePYQs: [],
-  };
-
   useEffect(() => {
     if (year && semester && branch) {
       setSubjectsLoading(true);
       setSubjectsError(null);
 
-      fetch(`${backendURL}/api/subjects?year=${year}&semester=${semester}&branch=${branch}`)
+      fetch(`https://my-backend-api-3qfx.onrender.com/api/subjects?year=${year}&semester=${semester}&branch=${branch}`)
         .then((res) => res.json())
         .then((data) => {
           setSubjects(Array.isArray(data.subjects) ? data.subjects : []);
           setSubject("");
-          setResources({ ...initialResources });
+          setResources({
+            notesUrl: [],
+            playlistUrls: [],
+            tutorialLinks: [],
+            pyqLinks: [],
+            pyqBookUrl: "",
+            subjectName: "",
+            yearWisePYQs: [],
+          });
           setSubjectsLoading(false);
         })
         .catch(() => {
@@ -74,12 +69,28 @@ function Navbar() {
           setSubjectsError("Failed to load subjects");
           setSubjectsLoading(false);
           setSubject("");
-          setResources({ ...initialResources });
+          setResources({
+            notesUrl: [],
+            playlistUrls: [],
+            tutorialLinks: [],
+            pyqLinks: [],
+            pyqBookUrl: "",
+            subjectName: "",
+            yearWisePYQs: [],
+          });
         });
     } else {
       setSubjects([]);
       setSubject("");
-      setResources({ ...initialResources });
+      setResources({
+        notesUrl: [],
+        playlistUrls: [],
+        tutorialLinks: [],
+        pyqLinks: [],
+        pyqBookUrl: "",
+        subjectName: "",
+        yearWisePYQs: [],
+      });
     }
   }, [year, semester, branch]);
 
@@ -88,7 +99,8 @@ function Navbar() {
       setResourcesLoading(true);
       setResourcesError(null);
 
-      fetch(`${backendURL}/api/resources?subject=${encodeURIComponent(subject)}&branch=${branch}`)
+      fetch(`https://my-backend-api-3qfx.onrender.com/api/resources?subject=${encodeURIComponent(subject)}&branch=${branch}`)
+
         .then((res) => res.json())
         .then((data) => {
           setResources({
@@ -107,7 +119,15 @@ function Navbar() {
           setResourcesLoading(false);
         });
     } else {
-      setResources({ ...initialResources });
+      setResources({
+        notesUrl: [],
+        playlistUrls: [],
+        tutorialLinks: [],
+        pyqLinks: [],
+        pyqBookUrl: "",
+        subjectName: "",
+        yearWisePYQs: [],
+      });
     }
   }, [subject]);
 
@@ -117,6 +137,7 @@ function Navbar() {
     navigate("/login");
   };
 
+  // ✅ Safely parse user for display
   let user = {};
   try {
     const userString = localStorage.getItem("user");

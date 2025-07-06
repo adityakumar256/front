@@ -10,16 +10,14 @@ function SubjectResources() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // ✅ Use Vite env for backend URL
-  const backendURL = import.meta.env.VITE_BACKEND_URL;
-
+  
   useEffect(() => {
     if (semester && branch && subject) {
       setLoading(true);
       setError(null);
 
-      // ✅ Use full URL
-      const url = `${backendURL}/api/resources?semester=${semester}&branch=${branch}&subject=${encodeURIComponent(subject)}`;
+      // 
+      const url = `/api/resources?semester=${semester}&branch=${branch}&subject=${encodeURIComponent(subject)}`;
 
       fetch(url)
         .then(res => {
@@ -27,11 +25,11 @@ function SubjectResources() {
           return res.json();
         })
         .then(data => {
+          
           setResources(data);
           setLoading(false);
         })
         .catch(err => {
-          console.error(err);
           setError('Failed to fetch resources');
           setLoading(false);
         });
@@ -45,27 +43,8 @@ function SubjectResources() {
       <h2>Find Resources</h2>
 
       <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
-        {/* ✅ Example selectors */}
-        <select value={semester} onChange={(e) => setSemester(e.target.value)}>
-          <option value="">Select Semester</option>
-          {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
-            <option key={num} value={num}>{num}</option>
-          ))}
-        </select>
-
-        <select value={branch} onChange={(e) => setBranch(e.target.value)}>
-          <option value="">Select Branch</option>
-          {['CSE', 'ECE', 'ME', 'CE', 'EE'].map(b => (
-            <option key={b} value={b}>{b}</option>
-          ))}
-        </select>
-
-        <input
-          type="text"
-          placeholder="Subject"
-          value={subject}
-          onChange={(e) => setSubject(e.target.value)}
-        />
+        {/* Semester, Branch, Subject selectors) */}
+        {/*  */}
       </div>
 
       {loading && <p>Loading resources...</p>}
@@ -79,10 +58,8 @@ function SubjectResources() {
               {resources[type] && resources[type].length > 0 ? (
                 <ul>
                   {resources[type].map((res) => (
-                    <li key={res.id || res.url}>
-                      <a href={res.url} target="_blank" rel="noopener noreferrer">
-                        {res.title || res.url}
-                      </a>
+                    <li key={res.id}>
+                      <a href={res.url} target="_blank" rel="noopener noreferrer">{res.title}</a>
                     </li>
                   ))}
                 </ul>
